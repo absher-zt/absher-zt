@@ -9,35 +9,45 @@
   </head>
 
   <body>
-    <main class="container">
-      <h1>Welcome to Tauri</h1>
-
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/src/assets/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img
-            src="/src/assets/tauri.svg"
-            class="logo tauri"
-            alt="Tauri logo"
-          />
-        </a>
-        <a href="https://www.typescriptlang.org/docs" target="_blank">
-          <img
-            src="/src/assets/typescript.svg"
-            class="logo typescript"
-            alt="typescript logo"
-          />
-        </a>
+    <img src="src/assets/absherbg.png" />
+    <main id="entercode" style="display: none">
+      <h2>AutoFill Request</h2>
+      <div id="mid"><label>Enter ZeroType Code <input type="text" id="codein"/></label> <a href="#" id="canceller">Cancel</a></div>
+      <div id="bottom"><span>Help</span> <span>FAQ</span> <span>Info</span></div>
+    </main>
+    <main id="confirm" style="display: none">
+      <h2>Confirm AutoFill Request</h2>
+      <hr/>
+      <div id="p">
+        <span id="sherika">Apex Car Rental</span>
+        is requesting one-time AutoFill to the following:
       </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
-
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
+      <table>
+        <tr data-absher="name"><label><td>Full Name</td> <td><input type="checkbox"/></td></label></tr>
+        <tr data-absher="email"><label><td>Email Address</td> <td><input type="checkbox"/></td></label></tr>
+        <tr data-absher="phone_number"><label><td>Phone Number</td> <td><input type="checkbox"/></td></label></tr>
+        <tr data-absher="id"><label><td>ID Number</td> <td><input type="checkbox"/></td></label></tr>
+        <tr data-absher="profile_picture"><label><td>Profile Picture</td> <td><input type="checkbox"/></td></label></tr>
+        <tr data-absher="license"><label><td>Driver's License</td> <td><input type="checkbox"/></td></label></tr>
+        <tr data-absher="id_image"><label><td>ID Image</td> <td><input type="checkbox"/></td></label></tr>
+      </table>
+      <footer>
+        <input type="submit" value="Grant Access" id="accesser" />
+        <input type="submit" value="Cancel" disabled />
+      </footer>
+    </main>
+    <main id="devmode" style="display: none">
+      <h2>Developer Tools</h2>
+      <table>
+        <tr><label><td>name</td> <td><input type="text" data-absher="name"/></td></label></tr>
+        <tr><label><td>email</td> <td><input type="email" data-absher="email"/></td></label></tr>
+        <tr><label><td>phone</td> <td><input type="tel" data-absher="phone_number"/></td></label></tr>
+        <tr><label><td>id#</td> <td><input type="tel" data-absher="id"/></td></label></tr>
+        <tr><label><td>pfp</td> <td><input type="file" data-absher="profile_picture"/></td></label></tr>
+        <tr><label><td>d. license</td> <td><input type="file" data-absher="license"/></td></label></tr>
+        <tr><label><td>id img</td> <td><input type="file" data-absher="id_image"/></td></label></tr>
+      </table>
+      <input type="submit" value="Leave" id="nodevmode" />
     </main>
   </body>
 </html>
