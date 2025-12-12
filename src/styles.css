@@ -152,3 +152,21 @@ input[type=checkbox] {
   width: 2rem;
   height: 2rem;
 }
+
+/*#throbber-circle {*/
+/*  stroke-dasharray: 30 600; !* reveal 30px *!*/
+/*  stroke-dashoffset: 0;*/
+/*  animation:*/
+/*          grow-shrink 1.7s ease-in-out infinite,*/
+/*          spin 0.9s linear infinite;*/
+/*}*/
+
+/*@keyframes grow-shrink {*/
+/*  0%   { stroke-dasharray: 1 600; }*/
+/*  50%  { stroke-dasharray: 90 600; }*/
+/*  100% { stroke-dasharray: 1 600; }*/
+/*}*/
+
+/*@keyframes spin {*/
+/*  to { stroke-dashoffset: -251.32; }*/
+/*}*/

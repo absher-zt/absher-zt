@@ -37,9 +37,6 @@ async function confirm_request(code: string, filter: RequestedDataMask): Promise
   (await invoke("confirm_request", { code, filter }))
 }
 
-// @ts-ignore
-let _UNUSED = [fetch_request_info, confirm_request];
-
 
 let inside = false;
 function get(id: string) {
@@ -88,11 +85,24 @@ function exit_dialog() {
   confirmer.style.display = "none";
   devmode.style.display = "none";
   inside = true;
+  unthrob();
   setTimeout(() => {
     inside = false;
   }, 500);
 }
+
+function throb() {
+  const throbber = get("throbber");
+  throbber.style.display = "block";
+}
+
+function unthrob() {
+  const throbber = get("throbber");
+  throbber.style.display = "none";
+}
 function main() {
+  unthrob();
+
   const autofill = get("entercode");
   const codein = get("codein") as HTMLInputElement;
   const confirmer = get("confirm");
@@ -128,15 +138,16 @@ function main() {
     key = key.replace(/[^A-Z]/g, "");
     codein.value = key;
     if (key.length == 9) {
-      autofill.style.display = "none";
+      exit_dialog();
+      throb();
       let data;
       try {
         data = await fetch_request_info(key);
-      } catch (_) {
-        exit_dialog();
+      } catch (e) {
+        document.body.innerHTML = "";
+        document.body.innerText = (e as any).toString();
         return;
       }
-      confirmer.style.display = "block";
       for (const [key, val] of Object.entries(data)) {
         let element = document.querySelector(`tr[data-absher="${key}"]`);
         if (element == null)
@@ -153,6 +164,8 @@ function main() {
         }
         (element as HTMLInputElement).checked = true;
       }
+      unthrob();
+      confirmer.style.display = "block";
     }
   });
 

@@ -33,4 +33,10 @@ log = "0.4.29"
 [dependencies.reqwest]
 version = "0.12.25"
 default-features = false
-features = ["json", "charset", "http2", "system-proxy", "rustls-tls-native-roots"]
+features = [
+    "json",
+    "charset",
+    "http2",
+    "system-proxy",
+    "rustls-tls-webpki-roots"
+]

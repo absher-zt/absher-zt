@@ -62,7 +62,8 @@ fn get_client() -> reqwest::Result<&'static Client> {
         return Ok(val);
     }
 
-    let client = Client::builder().build()?;
+    let client = Client::builder()
+        .build()?;
     Ok(CLIENT.get_or_init(|| client))
 }
 
