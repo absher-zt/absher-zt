@@ -1,69 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
-    <script type="module" src="/src/main.ts" defer></script>
+    <meta charset="utf-8" />
+    <title>Tauri + Leptos App</title>
+    <link data-trunk rel="css" href="styles.css"/>
+    <link data-trunk rel="copy-dir" href="public"/>
+    <link data-trunk rel="rust" data-wasm-opt="z"/>
   </head>
-
-  <body>
-    <svg id="throbber" width="100" height="100" viewBox="0 0 100 100" style="display: none;">
-      <path
-              id="throbber-circle"
-              fill="none"
-              stroke="white"
-              stroke-width="7"
-              stroke-linecap="round"
-              d="
-          M 50 10
-          A 40 40 0 1 1 50 90
-          A 40 40 0 1 1 50 10
-          A 40 40 0 1 1 50 90
-          A 40 40 0 1 1 50 10
-        "
-      />
-    </svg>
-    <img src="src/assets/absherbg.png" />
-    <main id="entercode" style="display: none">
-      <h2>AutoFill Request</h2>
-      <div id="mid"><label>Enter ZeroType Code <input type="text" id="codein"/></label> <a href="#" id="canceller">Cancel</a></div>
-      <div id="bottom"><span>Help</span> <span>FAQ</span> <span>Info</span></div>
-    </main>
-    <main id="confirm" style="display: none">
-      <h2>Confirm AutoFill Request</h2>
-      <hr/>
-      <div id="p">
-        <span id="sherika">Apex Car Rental</span>
-        is requesting one-time AutoFill to the following:
-      </div>
-      <table>
-        <tr data-absher="name"><label><td>Full Name</td> <td><input type="checkbox"/></td></label></tr>
-        <tr data-absher="email"><label><td>Email Address</td> <td><input type="checkbox"/></td></label></tr>
-        <tr data-absher="phone_number"><label><td>Phone Number</td> <td><input type="checkbox"/></td></label></tr>
-        <tr data-absher="id"><label><td>ID Number</td> <td><input type="checkbox"/></td></label></tr>
-        <tr data-absher="profile_picture"><label><td>Profile Picture</td> <td><input type="checkbox"/></td></label></tr>
-        <tr data-absher="license"><label><td>Driver's License</td> <td><input type="checkbox"/></td></label></tr>
-        <tr data-absher="id_image"><label><td>ID Image</td> <td><input type="checkbox"/></td></label></tr>
-      </table>
-      <footer>
-        <input type="submit" value="Grant Access" id="accesser" />
-        <input type="submit" value="Cancel" disabled />
-      </footer>
-    </main>
-    <main id="devmode" style="display: none">
-      <h2>Developer Tools</h2>
-      <table>
-        <tr><label><td>name</td> <td><input type="text" data-absher="name"/></td></label></tr>
-        <tr><label><td>email</td> <td><input type="email" data-absher="email"/></td></label></tr>
-        <tr><label><td>phone</td> <td><input type="tel" data-absher="phone_number"/></td></label></tr>
-        <tr><label><td>id#</td> <td><input type="tel" data-absher="id"/></td></label></tr>
-        <tr><label><td>pfp</td> <td><input type="file" data-absher="profile_picture"/></td></label></tr>
-        <tr><label><td>d. license</td> <td><input type="file" data-absher="license"/></td></label></tr>
-        <tr><label><td>id img</td> <td><input type="file" data-absher="id_image"/></td></label></tr>
-      </table>
-      <input type="submit" value="Leave" id="nodevmode" />
-    </main>
-  </body>
+  <body></body>
 </html>
