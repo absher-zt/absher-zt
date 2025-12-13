@@ -62,8 +62,7 @@ fn get_client() -> reqwest::Result<&'static Client> {
         return Ok(val);
     }
 
-    let client = Client::builder()
-        .build()?;
+    let client = Client::builder().build()?;
     Ok(CLIENT.get_or_init(|| client))
 }
 
@@ -232,10 +231,13 @@ pub fn run() {
         oneshot::channel::<(watch::Sender<AutofillData>, watch::Receiver<AutofillData>)>();
     let (started_init, wait_for_start) = oneshot::channel();
 
-    tauri::async_runtime::spawn(USER_DATA_CHANNEL.get_or_init(async move || {
-        started_init.send(()).unwrap();
-        rcv_channel.await.expect("failed to initialize user data DB")
-    }));
+    tauri::async_runtime::spawn(async move {
+        // not using async closure because rust analyzer BS
+        USER_DATA_CHANNEL.get_or_init(|| async move {
+            started_init.send(()).unwrap();
+            rcv_channel.await.expect("failed to initialize user data DB")
+        }).await;
+    });
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())

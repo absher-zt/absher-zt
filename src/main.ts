@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import {invoke} from "@tauri-apps/api/core";
 
 type RequestedDataMask = {
   name: boolean;
@@ -37,14 +37,23 @@ async function confirm_request(code: string, filter: RequestedDataMask): Promise
   (await invoke("confirm_request", { code, filter }))
 }
 
+const autofill = get("entercode");
+const confirmer = get("confirm");
+const devmode = get("devmode");
+const throbber = get("throbber");
+
+const codein = get("codein") as HTMLInputElement;
+const accesser = get("accesser");
+const nodevmode = get("nodevmode");
+const canceller = get("canceller");
 
 let inside = false;
 function get(id: string) {
   let autofill = document.getElementById(id);
   if (autofill == null)
   {
+    switch_to(null);
     throw new Error("oops");
-    exit_dialog();
   }
   return autofill;
 }
@@ -53,8 +62,8 @@ function getq(query: string) {
   let autofill = document.querySelector(query);
   if (autofill == null)
   {
+    switch_to(null);
     throw new Error("oops");
-    exit_dialog();
   }
   return autofill;
 }
@@ -77,43 +86,25 @@ function getImage(element: HTMLInputElement): Promise<string> {
   });
 }
 
-function exit_dialog() {
-  const autofill = get("entercode");
-  const confirmer = get("confirm");
-  const devmode = get("devmode");
+function switch_to(window: HTMLElement | null = null) {
   autofill.style.display = "none";
   confirmer.style.display = "none";
   devmode.style.display = "none";
+  throbber.style.display = "none";
+  if (window != null)
+    window.style.display = "block";
+
   inside = true;
-  unthrob();
   setTimeout(() => {
-    inside = false;
+    inside = window != null;
   }, 500);
 }
 
-function throb() {
-  const throbber = get("throbber");
-  throbber.style.display = "block";
-}
-
-function unthrob() {
-  const throbber = get("throbber");
-  throbber.style.display = "none";
-}
 function main() {
-  unthrob();
-
-  const autofill = get("entercode");
-  const codein = get("codein") as HTMLInputElement;
-  const confirmer = get("confirm");
-  const accesser = get("accesser");
-  const devmode = get("devmode");
-  const nodevmode = get("nodevmode");
-  const canceller = get("canceller");
   let key = "";
 
   canceller.addEventListener("click", () => {
-    exit_dialog();
+    switch_to(null);
   });
   document.body.addEventListener("click", async e => {
     let bottomness= e.y > window.innerHeight * 2/3;
@@ -121,16 +112,15 @@ function main() {
       return;
     if (bottomness) {
       let info = await load_data_from_store();
-      devmode.style.display = "block";
-      let name = info.name[0] + " " + info.name[1];
-      (getq("input[data-absher=name]") as HTMLInputElement).value = name;
+      (getq("input[data-absher=name]") as HTMLInputElement).value = info.name[0] + " " + info.name[1];
       (getq("input[data-absher=email]") as HTMLInputElement).value = info.email;
       (getq("input[data-absher=phone_number]") as HTMLInputElement).value = info.phone_number;
       (getq("input[data-absher=id]") as HTMLInputElement).value = info.id;
+      switch_to(devmode);
     } else {
-      autofill.style.display = "block";
+      codein.value = "";
+      switch_to(autofill);
     }
-    inside = true;
   });
   codein.addEventListener("input", async () => {
     key = codein.value;
@@ -138,8 +128,7 @@ function main() {
     key = key.replace(/[^A-Z]/g, "");
     codein.value = key;
     if (key.length == 9) {
-      exit_dialog();
-      throb();
+      switch_to(throbber);
       let data;
       try {
         data = await fetch_request_info(key);
@@ -152,25 +141,19 @@ function main() {
         let element = document.querySelector(`tr[data-absher="${key}"]`);
         if (element == null)
         {
-          exit_dialog();
+          switch_to(null);
           return;
         }
         (element as HTMLTableRowElement).style.display = val ? "block" : "none";
-        let element2 = document.querySelector(`tr[data-absher="${key}"] input`);
-        if (element2 == null)
-        {
-          exit_dialog();
-          return;
-        }
-        (element as HTMLInputElement).checked = true;
       }
-      unthrob();
-      confirmer.style.display = "block";
+      for (let element of document.querySelectorAll("tr input[type=checkbox]"))
+        (element as HTMLInputElement).checked = true;
+      switch_to(confirmer);
     }
   });
 
   accesser.addEventListener("click", async e => {
-    exit_dialog();
+    switch_to(throbber);
     e.preventDefault();
     let dict: RequestedDataMask = {
       name: false,
@@ -185,7 +168,7 @@ function main() {
       let element = document.querySelector(`tr[data-absher="${key}"] input`);
       if (element == null)
       {
-        exit_dialog();
+        switch_to(null);
         return;
       }
       // @ts-ignore
@@ -193,11 +176,12 @@ function main() {
     }
 
     await confirm_request(key, dict);
+    switch_to(null);
     return 0;
   });
 
   nodevmode.addEventListener("click", async () => {
-    exit_dialog();
+    switch_to(null);
     try {
       let names = (getq("input[data-absher=name]") as HTMLInputElement).value.split(" ");
 
@@ -218,9 +202,6 @@ function main() {
         license,
         id_image
       };
-
-// @ts-ignore
-      let what = info;
 
       await store_data_to_store(info);
     } catch (e) {
