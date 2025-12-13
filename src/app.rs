@@ -1,7 +1,8 @@
-use leptos::task::spawn_local;
-use leptos::{ev::SubmitEvent, prelude::*};
-use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
+use serde::{Deserialize, Serialize};
+use serde_wasm_bindgen as swb;
+use anyhow::Result;
+use leptos::{component, view, IntoView};
 
 #[wasm_bindgen]
 extern "C" {
@@ -9,59 +10,81 @@ extern "C" {
     async fn invoke(cmd: &str, args: JsValue) -> JsValue;
 }
 
-#[derive(Serialize, Deserialize)]
-struct GreetArgs<'a> {
-    name: &'a str,
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+pub struct RequestedDataMask {
+    pub name: bool,
+    pub email: bool,
+    pub phone_number: bool,
+    pub id: bool,
+    pub profile_picture: bool,
+    pub license: bool,
+    pub id_image: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RequestedData {
+    pub name: Vec<String>,
+    pub email: String,
+    pub phone_number: String,
+    pub id: String,
+    pub profile_picture: String,
+    pub license: String,
+    pub id_image: String,
+}
+
+pub async fn fetch_request_info(code: &str) -> Result<RequestedDataMask> {
+    #[derive(Serialize, Deserialize)]
+    struct FetchRequestInfo<'a> {
+        code: &'a str
+    }
+    let args = swb::to_value(&FetchRequestInfo {
+        code
+    })?;
+
+    let out = invoke("fetch_request_info", args).await;
+
+    swb::from_value(out).map_err(anyhow::Error::new)
+}
+
+pub async fn load_data_from_store() -> Result<RequestedData> {
+    let args = JsValue::from(js_sys::Object::new());
+    let out = invoke("load_data_from_store", args).await;
+    swb::from_value(out).map_err(anyhow::Error::new)
+}
+
+pub async fn store_data_to_store(data: &RequestedData) -> Result<()> {
+    #[derive(Serialize, Deserialize)]
+    struct StoreDataRequest<'a> {
+        data: &'a RequestedData
+    }
+    let args = swb::to_value(&StoreDataRequest {
+        data
+    })?;
+
+    let _ = invoke("store_data_to_store", args).await;
+    Ok(())
+}
+
+pub async fn confirm_request(code: &str, filter: &RequestedDataMask) -> Result<()> {
+    #[derive(Serialize, Deserialize)]
+    struct ConfirmRequest<'a> {
+        code: &'a str,
+        filter: &'a RequestedDataMask
+    }
+
+    let args = swb::to_value(&ConfirmRequest {
+        code,
+        filter
+    })?;
+
+    let _ = invoke("confirm_request", args).await;
+    Ok(())
+}
+
 
 #[component]
 pub fn App() -> impl IntoView {
-    let (name, set_name) = signal(String::new());
-    let (greet_msg, set_greet_msg) = signal(String::new());
-
-    let update_name = move |ev| {
-        let v = event_target_value(&ev);
-        set_name.set(v);
-    };
-
-    let greet = move |ev: SubmitEvent| {
-        ev.prevent_default();
-        spawn_local(async move {
-            let name = name.get_untracked();
-            if name.is_empty() {
-                return;
-            }
-
-            let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &name }).unwrap();
-            // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-            let new_msg = invoke("greet", args).await.as_string().unwrap();
-            set_greet_msg.set(new_msg);
-        });
-    };
-
     view! {
-        <main class="container">
-            <h1>"Welcome to Tauri + Leptos"</h1>
-
-            <div class="row">
-                <a href="https://tauri.app" target="_blank">
-                    <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo"/>
-                </a>
-                <a href="https://docs.rs/leptos/" target="_blank">
-                    <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo"/>
-                </a>
-            </div>
-            <p>"Click on the Tauri and Leptos logos to learn more."</p>
-
-            <form class="row" on:submit=greet>
-                <input
-                    id="greet-input"
-                    placeholder="Enter a name..."
-                    on:input=update_name
-                />
-                <button type="submit">"Greet"</button>
-            </form>
-            <p>{ move || greet_msg.get() }</p>
-        </main>
+        <div></div>
     }
 }
